@@ -11,6 +11,7 @@ class Config(object):
     TEMPLATE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     APP = None
+    SQLALCHEMY_DATABASE_URI ='mysql+mysqldb://root:@localhost:3306/livro_flask'
 
 class DevelopmentConfig(Config):
     # Habilita exibição de recursos de warning e erros
@@ -18,7 +19,7 @@ class DevelopmentConfig(Config):
 
     # Habilita log na tela do terminal
     DEBUG = True
-    
+
     IP_HOST = 'localhost'
     PORT_HOST = 8000
     URL_MAIN = 'http://%s:%s/' % (IP_HOST, PORT_HOST)
