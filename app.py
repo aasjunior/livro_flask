@@ -1,8 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, redirect, render_template
 from config import app_config, app_active
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from model.models import *
+from controller.User import UserController
+
 
 config = app_config[app_active]
 
@@ -26,34 +28,33 @@ def create_app(config_name):
     def login():
         return 'Tela de login'
     
+    @app.route('/login/', methods=['POST'])
+    def login_post():
+        user = UserController()
+
+        email = request.form['email']
+        password = request.form['password']
+
+        result = user.login(email, password)
+
+        if result:
+            return redirect('/admin')
+        else:
+            return render_template('login.html', data={'status':401, 'msg': 'Dados de usuário incorretos', 'type': None})
+
     @app.route('/recovery-password')
     def recovery_password():
         return 'Tela de recuperação de senha'
     
-    @app.route('/profile/<int:id>/action/<action>/')
-    def profile(id, action):
-        if action == 'action1':
-            return 'Ação action1 usuário de ID %d' % id
-        if action == 'action2':
-            return 'Ação action2 usuário de ID %d' % id
-        if action == 'action3':
-            return 'Ação action3 usuário de ID %d' % id
-        
-    @app.route('/profile', methods=['POST', 'GET'])
-    def create_profile():
-        username = request.form['username']
-        password = request.form['password']
+    @app.route('/recovery-password/', methods=['POST'])
+    def send_recovery_password():
+        user = UserController()
 
-        if request.method == 'POST':
-            return 'Essa rota possui um método POST e criará um usuário com os dados de usuário %s e a senha %s' % (username, password)
-        elif request.method == 'GET':
-            return 'Método GET sendo requisitado'
+        result = user.recovery(request.form['email'])
 
-    @app.route('/profile/<int:id>', methods=['PUT'])
-    def edit_total_profile(id):
-        username = request.form['username']
-        password = request.form['password']
-
-        return 'Essa rota possui um método PUT e editará o nome do usuário para %s e a senha para %s' % (username, password)
-
+        if result:
+            return render_template('recovery.html', data={'status':200, 'msg': 'E-mail de recuperação enviado com sucesso'})
+        else:
+            return render_template('recovery.html', data={'status':401, 'msg': 'Erro ao enviar e-mail de recuperação'})
+    
     return app
