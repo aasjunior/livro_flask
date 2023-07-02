@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from model.models import *
 from controller.User import UserController
+from admin.Admin import start_views
 
 
 config = app_config[app_active]
@@ -16,6 +17,9 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # ativar área administrativa
+    start_views(app, db)
 
     db.init_app(app)
     migrate = Migrate(app, db)
